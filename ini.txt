@@ -1,2 +1,113 @@
-Expert Project
-Changing the world...
+
+/*
+* Autor: Helmo Araújo
+* Data Criação: 23/10/2015
+* Data de Alteração 25/04/2015
+* Descrição: Versão inicial do software embarcado no arduino para plataforma Expert
+* ALTERAÇÃOLê a temperatura do sensor LM35 - O valor lido no sensor é multiplicado por uma cosntante.
+*/          
+              
+int leitura;
+int option;
+float temp;
+
+
+#include <stdlib.h>
+
+
+ 
+void setup() 
+            {
+              Serial.begin(9600);    //configura comunicação serial com 9600 bps
+              Serial.println("Digite '1' medir temperatura.");
+              Serial.println("Digite '2' medir distancia");
+              Serial.println("Digite '3' Modificar freq. LED");
+              Serial.println("Digite '4' Sensor LDR");
+              delay(500);
+            }
+ 
+void loop() 
+{
+  
+//*********************************** ESCOLHA DE SENSORES I **********************************************************************
+   
+            if (Serial.available()) //se byte pronto para leitura
+                                  {
+                                  leitura = Serial.read();
+          
+                                    if(leitura == '1')
+                                         {
+                                         option = 1;
+
+                                         }  
+                                    else if(leitura == '2')
+                                         {
+                                         option = 2;
+
+                                         }
+                                    else if(leitura == '3')
+                                         {
+                                         option = 3;
+                                         }    
+                                    else if(leitura == '4')
+                                         {
+                                         option = 4;
+                                         }                       
+                                  }
+                                  
+//********************************** ESCOLHA DE SENSORES II *********************************************************************
+            
+            if (option == 1){
+                            int pinA0 = A0;             
+                            temp = analogRead(pinA0)*0.48828125;
+                            Serial.println(temp);
+                            //Serial.println("C");
+                            delay(1000);  
+                            }
+                  
+            else if (option == 2){         
+                                 #define echoPin 10 //Pino 10 recebe o pulso do echo  
+                                 #define trigPin 14 //Pino A0 envia o pulso para gerar o echo  (utiliza o analogico como digital)
+              
+                                 pinMode(echoPin, INPUT); // define o pino 13 como entrada (recebe)  
+                                 pinMode(trigPin, OUTPUT); // define o pino 12 como saida (envia)  
+                              
+                                //seta o pino 12 com um pulso baixo "LOW" ou desligado ou ainda 0  
+                                  digitalWrite(trigPin, LOW);  
+                                // delay de 2 microssegundos  
+                                  delayMicroseconds(2);  
+                                //seta o pino 12 com pulso alto "HIGH" ou ligado ou ainda 1  
+                                  digitalWrite(trigPin, HIGH);  
+                                //delay de 10 microssegundos  
+                                  delayMicroseconds(10);  
+                                //seta o pino 12 com pulso baixo novamente  
+                                  digitalWrite(trigPin, LOW);  
+                                //pulseInt lê o tempo entre a chamada e o pino entrar em high  
+                                  long duration = pulseIn(echoPin,HIGH);  
+                                //Esse calculo é baseado em s = v . t, lembrando que o tempo vem dobrado  
+                                //porque é o tempo de ida e volta do ultrassom  
+                                  long distancia = duration /29 / 2 ;  
+                                
+                                //Serial.print("Distancia em CM: ");  
+                                  Serial.println(distancia);  
+                                  delay(250); //espera 1 segundo para fazer a leitura novamente         
+                                  }
+            
+            else if (option == 3){
+                                int ledAzul = 10;         
+                                int potenciometro = A1;
+                                int tempoDeEspera;
+                                tempoDeEspera = analogRead(potenciometro);
+                                digitalWrite(ledAzul, HIGH);
+                                delay(tempoDeEspera);
+                                digitalWrite(ledAzul, LOW);
+                                delay(tempoDeEspera);
+                                Serial.println(tempoDeEspera);
+                                }
+            else if  (option == 4){
+                            int pinA0 = A0;             
+                            temp = analogRead(pinA0);
+                            Serial.println(temp);
+                            delay(1000);  
+                            }
+}
